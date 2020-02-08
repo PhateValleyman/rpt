@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python3
 
 import os
 import re
@@ -21,7 +21,7 @@ def create_proc(cmd, d):
 
     out, err = p.communicate()
 
-    return (out, err, p.returncode)
+    return (str(out), str(err), p.returncode)
 
 
 def git_repo_updated(res, d):
@@ -30,8 +30,8 @@ def git_repo_updated(res, d):
     r = os.path.basename(d)
 
     if verbosity > 0:
-        print d + " -> Git stdout: " + "[" + stdout + "]"
-        print d + " -> Git stderr: " + "[" + stderr + "]"
+        print(d + " -> Git stdout: " + "[" + stdout + "]")
+        print(d + " -> Git stderr: " + "[" + stderr + "]")
 
     # NOTE: For some reason adding the ^ character to match at the beginning of the line breaks this.
     # NOTE: For some other reason, "current branch" pattern does not match on Linux, unless multiline is disabled.
@@ -48,7 +48,7 @@ def git_repo_updated(res, d):
         pass
     #    status = cTxtBoldRed + "(unknown Git update status)"
 
-    print cTxtBoldBlue + "[Git] " + cTxtDefault + r + " -> " + status + cTxtDefault
+    print(cTxtBoldBlue + "[Git] " + cTxtDefault + r + " -> " + status + cTxtDefault)
 
 
 def svn_repo_updated(res, d):
@@ -59,7 +59,7 @@ def svn_repo_updated(res, d):
     if len(stdout) == 0:
         status = cTxtBoldGreen + "(already up-to-date)"
 
-    print cTxtGreen + "[SVN] " + cTxtDefault + r + " -> " + status + cTxtDefault
+    print(cTxtGreen + "[SVN] " + cTxtDefault + r + " -> " + status + cTxtDefault)
 
 
 def lambda_factory(d, func):
@@ -102,7 +102,7 @@ def update_repo(pool, d):
             callback=repo_updated
         )
     else:
-        print r + " -> " + cTxtBoldRed + "(not a repo)" + cTxtDefault
+        print(r + " -> " + cTxtBoldRed + "(not a repo)" + cTxtDefault)
 
 
 def update_repos_dir(pool, reposDir):
@@ -120,12 +120,12 @@ def update_repos_dir(pool, reposDir):
 def main(repo_or_dir_name, verbose):
     global verbosity
     verbosity = verbose
-    print "Verbosity:", verbosity
+    print("Verbosity:", verbosity)
 
     if repo_or_dir_name is not None:
         isRepo, _, _, _ = is_repo(repo_or_dir_name)
         if isRepo:
-            print "Looking at specified repo '%s' ...\n" % repo_or_dir_name
+            print("Looking at specified repo '%s' ...\n" % repo_or_dir_name)
             update_repo(threadPool, repo_or_dir_name)
         else:
             parent = repo_or_dir_name
@@ -133,7 +133,7 @@ def main(repo_or_dir_name, verbose):
                 parent = os.path.abspath(os.path.join(parent, os.pardir))
                 isRepo, _, _, _ = is_repo(parent)
                 if isRepo:#
-                    print "Looking at parent repo in specified directory '%s' ...\n" % repo_or_dir_name
+                    print("Looking at parent repo in specified directory '%s' ...\n" % repo_or_dir_name)
                     update_repo(threadPool, parent)
                     break
 
@@ -141,10 +141,10 @@ def main(repo_or_dir_name, verbose):
                     break
 
             if parent == '/':
-                print "Looking at repos in specified directory '%s' ...\n" % repo_or_dir_name
+                print("Looking at repos in specified directory '%s' ...\n" % repo_or_dir_name)
                 update_repos_dir(threadPool, repo_or_dir_name)
     else:
-        print "Looking at repos in preconfigured directories '%s' ...\n" % REPOS_DIRS
+        print("Looking at repos in preconfigured directories '%s' ...\n" % REPOS_DIRS)
         for reposDir in REPOS_DIRS:
             update_repos_dir(threadPool, reposDir)
 

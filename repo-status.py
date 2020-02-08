@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python3
 
 import subprocess
 import os
@@ -16,16 +16,16 @@ def repo_get_info(d, t, subproc, display_only_changed):
     stdout, stderr = subproc.communicate()
     with lock:
         if t == "git":
-            info = git_get_info(d, stdout)
+            info = git_get_info(d, str(stdout))
         elif t == "svn":
-            info = svn_get_info(d, stdout)
+            info = svn_get_info(d, str(stdout))
         else:
-            print "ERROR: Did not expect to reach this state: (%s, %s)" % d, t
+            print("ERROR: Did not expect to reach this state: (" + d + ", " + t + ")")
             os.exit(1)
 
         has_changes = info[0]
         if (not display_only_changed) or has_changes == True:
-            print d + " -> " + info[1] + cTxtDefault
+            print(d + " -> " + info[1] + cTxtDefault)
 
 
 def git_get_info(d, status):
@@ -42,7 +42,7 @@ def git_get_info(d, status):
         has_changes = False
 
     if verbosity != 0:
-        print d + " -> extra Git output: " + cTxtRed + "[" + status + "]" + cTxtDefault
+        print(d + " -> extra Git output: " + cTxtRed + "[" + status + "]" + cTxtDefault)
 
     return (has_changes, cTxtBoldGreen + "Git " + output)
 
@@ -54,7 +54,7 @@ def svn_get_info(d, status):
     if len(status) == 0:
         output = cTxtBoldGreen + "(no local changes)"
     elif verbosity != 0:
-        print "Extra SVN output: [" + status + "]"
+        print("Extra SVN output: [" + status + "]")
 
     return cTxtBoldBlue + "SVN " + output
 
@@ -70,26 +70,26 @@ def main(dir_name, verbose, only_changed):
     global verbosity
     verbosity = verbose
     if verbosity > 0:
-        print "Verbosity:", verbosity
-    #print "Only display repositories with changes:", only_changed
+        print("Verbosity:", verbosity)
+    #print("Only display repositories with changes:", only_changed)
 
     if dir_name is None:
         dirs = REPOS_DIRS
     else:
         dirs = [ dir_name ]
 
-    #print "Printing status of repositories in '%s'" % dirs
+    #print("Printing status of repositories in '%s'" % dirs)
 
     for reposDir in dirs:
         parent = os.path.abspath(reposDir)
-        print
-        print "Looking at repos in " + cTxtGreen + parent + cTxtDefault + "..."
+        print()
+        print("Looking at repos in " + cTxtGreen + parent + cTxtDefault + "...")
 
         for d in os.listdir(parent):
             if not os.path.isdir(os.path.join(parent, d)):
                 continue
 
-            #print "Looking at '%s' in %s ..." % (d, parent)
+            #print("Looking at '%s' in %s ..." % (d, parent))
             os.chdir(os.path.join(parent, d))
             if os.path.isdir(".git"):
                 cmd = ["git", "status"]
@@ -99,13 +99,12 @@ def main(dir_name, verbose, only_changed):
                 t = "svn"
             else:
                 with lock:
-                    print d + " -> " + cTxtBoldRed + "(not a repo)" + cTxtDefault
+                    print(d + " -> " + cTxtBoldRed + "(not a repo)" + cTxtDefault)
 
                 continue
 
-            #print "CWD: %s" % os.getcwd()
+            #print("CWD: %s" % os.getcwd())
 
-            # TODO: race condition between print call above and print calls in the subprocess
             sp = subprocess.Popen(
                 cmd,
                 cwd=os.path.join(parent, d),
@@ -113,13 +112,16 @@ def main(dir_name, verbose, only_changed):
                 stderr=subprocess.PIPE,
             )
 
-            thread = threading.Thread(target=repo_get_info, args=[d, t, sp, only_changed])
-            thread.start()
-            threads.append(thread)
+            repo_get_info(d, t, sp, only_changed)
+            # TODO: why was I multithreading this anyway?
+            #thread = threading.Thread(target=repo_get_info, args=[d, t, sp, only_changed])
+            #thread.start()
+            #threads.append(thread)
 
-    for th in threads:
-        th.join()
-    print
+    # TODO: why was I multithreading this anyway?
+    #for th in threads:
+    #    th.join()
+    print()
 
 if __name__ == '__main__':
     main()

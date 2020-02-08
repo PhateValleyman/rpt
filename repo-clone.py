@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python3
 
 import os
 import subprocess
@@ -26,11 +26,11 @@ def repo_cloned(ret):
 
     stdout, stderr, errcode, cmd, i = ret
     if errcode == 0:
-        print "Cloned from " + cmd[2] + " successfully"
+        print("Cloned from " + cmd[2] + " successfully")
         cloned = cloned + 1
         clonedno = i
     else:
-        print "INFO: Could not clone from " + cmd[2]
+        print("INFO: Could not clone from " + cmd[2])
         #print "Error:\n"
         #print "Stdout: %s\n", stdout
         #print "Stderr: %s\n", stderr
@@ -42,7 +42,7 @@ def repo_cloned(ret):
 @click.argument('repo_name', required=True, type=click.STRING)#, help="The name of the repository to search for.")
 @click.argument('dir_name', required=False, type=click.STRING)#, help="Directory where repository will be cloned in.")
 def main(repo_name, dir_name):
-    print "Looking for repos remotely at '%s' ...\n" % REMOTES
+    print("Looking for repos remotely at '%s' ...\n" % REMOTES)
 
     if dir_name == None:
         dir_name = repo_name
@@ -52,11 +52,11 @@ def main(repo_name, dir_name):
     i = 1
 
     if len(REMOTES) == 0:
-        print "ERROR: Please configure remotes in remotes.conf"
+        print("ERROR: Please configure remotes in remotes.conf")
         return
 
     if os.path.isdir(dir_name):
-        print "ERROR: Target directory '%s' already exist. Please specify another one (see --help).\n" % dir_name
+        print("ERROR: Target directory '%s' already exist. Please specify another one (see --help).\n" % dir_name)
         return
     else:
         os.mkdir(dir_name)
@@ -80,15 +80,16 @@ def main(repo_name, dir_name):
     pool.close()
     pool.join()
 
-    print
+    print()
     if cloned == 1:
         os.rename(dir_name + str(clonedno), dir_name)
-        print "Found repository successfully! Stored in '%s' directory." % dir_name
+        print("Found repository successfully! Stored in '%s' directory." % dir_name)
     elif cloned == 0:
-        print "No '%s' repository was found!" % repo_name
+        print("No '%s' repository was found!" % repo_name)
+        os.rmdir(dir_name)
     else:
-        print "WARNING: Found multiple repositories remotely! Cloned all of them in '%s[1-9]*', so please take a look at ALL the directories." % dir_name
-    print
+        print("WARNING: Found multiple repositories remotely! Cloned all of them in '%s[1-9]*', so please take a look at ALL the directories." % dir_name)
+    print()
 
 
 if __name__ == '__main__':
