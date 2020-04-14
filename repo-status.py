@@ -98,8 +98,9 @@ def main(dir_name, verbose, only_changed):
                 cmd = ["svn", "status"]
                 t = "svn"
             else:
-                with lock:
-                    print(d + " -> " + cTxtBoldRed + "(not a repo)" + cTxtDefault)
+                if verbosity > 0:
+                    with lock:
+                        print(d + " -> " + cTxtBoldRed + "(not a repo)" + cTxtDefault)
 
                 continue
 

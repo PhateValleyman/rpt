@@ -102,7 +102,8 @@ def update_repo(pool, d):
             callback=repo_updated
         )
     else:
-        print(r + " -> " + cTxtBoldRed + "(not a repo)" + cTxtDefault)
+        if verbosity > 0:
+            print(r + " -> " + cTxtBoldRed + "(not a repo)" + cTxtDefault)
 
 
 def update_repos_dir(pool, reposDir):
