@@ -3,7 +3,7 @@
 import os
 import subprocess
 from multiprocessing.pool import ThreadPool
-from pylibs.reporemotes import REMOTES
+from rpt.reporemotes import REMOTES
 
 import click    # command line arguments
 

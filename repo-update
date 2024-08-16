@@ -5,8 +5,8 @@ import re
 import click    # command line arguments
 import subprocess
 from multiprocessing.pool import ThreadPool
-from pylibs.colors import *
-from pylibs.repodir import REPOS_DIRS
+from rpt.colors import *
+from rpt.repodir import REPOS_DIRS
 
 threadPool = ThreadPool(16)
 verbosity = 0;
